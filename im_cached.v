@@ -36,24 +36,6 @@ module im_cached(
 	im_slow #(.NMEM(NMEM), .IM_DATA(IM_DATA), .ND(ND))
 			ims1(.clk(clk), .addr(addr), .rdy(rdy), .data(mem_data));
 
-	//
-	//            ADDRESS
-	//  31         4 3         2 1   0
-	// +------------+-----------+-----+
-	// |     tag    |   index   | X X |
-	// +------------+-----------+-----+
-	//
-	// 							  X X - byte index
-	//
-	//  tag: 28 bits
-	//  index: 2 bits (4 blocks)
-	//
-	//             BLOCK
-	//    60  59     32 31     0
-	//   +---+---------+--------+
-	//   | V |   tag   |  word  |
-	//   +---+---------+--------+
-	//
 
 	// decode address
 	//wire [1:0]		byte_idx;
