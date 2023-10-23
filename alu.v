@@ -13,7 +13,6 @@ module alu(
 	wire [31:0] add_ab;
 	wire 		oflow_add;
 	wire 		oflow_sub;
-	wire 		oflow;
 	wire 		slt;
 
 	assign zero = (0 == out);
@@ -29,7 +28,7 @@ module alu(
 	assign oflow_add = (a[31] == b[31] && add_ab[31] != a[31]) ? 1 : 0;
 	assign oflow_sub = (a[31] == b[31] && sub_ab[31] != a[31]) ? 1 : 0;
 
-	assign oflow = (ctl == 4'b0010) ? oflow_add : oflow_sub;
+	//assign oflow = (ctl == 4'b0010) ? oflow_add : oflow_sub;
 
 	// set if less than, 2s compliment 32-bit numbers
 	assign slt = oflow_sub ? ~(a[31]) : a[31];
