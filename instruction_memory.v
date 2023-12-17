@@ -1,5 +1,5 @@
 /*
- * im.v - instruction memory
+ * instruction memory
  *
  */
 
