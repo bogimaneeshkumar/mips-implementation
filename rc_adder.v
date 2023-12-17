@@ -1,12 +1,7 @@
 /*
- * rc_adder.v - ripple carry adder
+ *ripple carry adder
  */
 
-`include "full_adder.v"
-`include "half_adder.v"
-
-`ifndef _rc_adder
-`define _rc_adder
 
 module rc_adder(
 		input wire	[N-1:0] a,
