@@ -11,7 +11,7 @@ module dm(
 		input wire	[6:0]	addr,
 		input wire			rd, wr,
 		input wire 	[31:0]	wdata,
-		output wir	[31:0]	rdata);
+		output reg	[31:0]	rdata);
 
 	reg [31:0] mem [0:127];  // 32-bit memory with 128 entries
 
