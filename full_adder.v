@@ -10,5 +10,3 @@ module full_adder(
 	assign c = (a & b) | (c_in & (a ^ b));
 
 endmodule
-
-`endif
