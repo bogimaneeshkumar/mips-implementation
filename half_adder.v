@@ -1,5 +1,3 @@
-`ifndef _half_adder
-`define _half_adder
 
 module half_adder(
 		input	a,
@@ -11,5 +9,3 @@ module half_adder(
 	assign c = a & b;
 
 endmodule
-
-`endif
