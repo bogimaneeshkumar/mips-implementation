@@ -5,9 +5,9 @@
 module regr #(
     parameter N = 1
 ) (
-    input clk,
-    input clear,
-    input hold,
+    input wire clk,
+    input wire clear,
+    input wire hold,
     input wire [N-1:0] in,
     output reg [N-1:0] out
 );
