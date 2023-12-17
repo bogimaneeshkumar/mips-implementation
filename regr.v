@@ -12,7 +12,7 @@ module regr #(
     output reg [N-1:0] out
 );
 
-    always_ff @(posedge clk) begin
+    always@(posedge clk) begin
         if (clear)
             out <= {N{1'b0}};
         else if (hold)
