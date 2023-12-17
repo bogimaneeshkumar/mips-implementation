@@ -6,7 +6,7 @@
 module rc_adder(
 		input wire	[N-1:0] a,
 		input wire	[N-1:0] b,
-		output wir  [N-1:0] s,
+		output wire  [N-1:0] s,
 		output wire			c);
 
 	parameter N = 32;  /* number of bits */
