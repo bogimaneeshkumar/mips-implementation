@@ -1,7 +1,5 @@
 /*
- * NAME
- *
- * regr - register of data that can be held or cleared
+ *simple register which can hold data and clear
  */
 
 module regr #(
