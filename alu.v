@@ -6,7 +6,7 @@ module alu(
 		input		[3:0]	ctl,
 		input		[31:0]	a, b,
 		output reg	[31:0]	out,
-		output			zero);
+		output	reg	zero);
 
 	wire [31:0] sub_ab;
 	wire [31:0] add_ab;
