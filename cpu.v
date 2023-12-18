@@ -14,51 +14,17 @@
  * be at the stage at which the variable is first
  * established.
  */
-
-`include "regr.v"
-`include "im.v"
-`include "regm.v"
-`include "control.v"
-`include "alu.v"
-`include "alu_control.v"
-`include "dm.v"
-
-`ifndef DEBUG_CPU_STAGES
-`define DEBUG_CPU_STAGES 0
-`endif
-
 module cpu(
 		input wire clk);
 
 	parameter NMEM = 20;  // number in instruction memory
-	parameter IM_DATA = "im_data.txt";
 
 	wire regwrite_s5;
 	wire [4:0] wrreg_s5;
 	wire [31:0]	wrdata_s5;
 	reg stall_s1_s2;
 
-	// {{{ diagnostic outputs
-	initial begin
-		if (`DEBUG_CPU_STAGES) begin
-			$display("if_pc,    if_instr, id_regrs, id_regrt, ex_alua,  ex_alub,  ex_aluctl, mem_memdata, mem_memread, mem_memwrite, wb_regdata, wb_regwrite");
-			$monitor("%x, %x, %x, %x, %x, %x, %x,         %x,    %x,           %x,            %x,   %x",
-					pc,				/* if_pc */
-					inst,			/* if_instr */
-					data1,			/* id_regrs */
-					data2,			/* id_regrt */
-					data1_s3,		/* data1_s3 */
-					alusrc_data2,	/* alusrc_data2 */
-					aluctl,			/* ex_aluctl */
-					data2_s4,		/* mem_memdata */
-					memread_s4,		/* mem_memread */
-					memwrite_s4,	/* mem_memwrite */
-					wrdata_s5,		/* wb_regdata */
-					regwrite_s5		/* wb_regwrite */
-				);
-		end
-	end
-	// }}}
+	
 
 	// {{{ flush control
 	reg flush_s1, flush_s2, flush_s3;
