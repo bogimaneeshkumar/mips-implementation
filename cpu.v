@@ -26,7 +26,8 @@ module cpu(
 
 	
 
-	// {{{ flush control
+	/*  flush control to flush the 1st 3 stages of pipeline in case of 
+	  jump or branch instrustions to prevent from hazards */
 	reg flush_s1, flush_s2, flush_s3;
 	always @(*) begin
 		flush_s1 <= 1'b0;
@@ -38,36 +39,21 @@ module cpu(
 			flush_s3 <= 1'b1;
 		end
 	end
-	// }}}
+	
 
-	// {{{ stage 1, IF (fetch)
+	// stage 1, IF (fetch)
 
 	reg  [31:0] pc;
 	initial begin
 		pc <= 32'd0;
 	end
-
-	wire [31:0] pc4;  // PC + 4
-	assign pc4 = pc + 4;
-
-	always @(posedge clk) begin
-		if (stall_s1_s2) 
-			pc <= pc;
-		else if (pcsrc == 1'b1)
-			pc <= baddr_s4;
-		else if (jump_s4 == 1'b1)
-			pc <= jaddr_s4;
-		else
-			pc <= pc4;
-	end
-
 	// pass PC + 4 to stage 2
 	wire [31:0] pc4_s2;
 	regr #(.N(32)) regr_pc4_s2(.clk(clk),
 						.hold(stall_s1_s2), .clear(flush_s1),
 						.in(pc4), .out(pc4_s2));
 
-	// instruction memory
+	// instruction memory and pass instruction from stage 1 to 2
 	wire [31:0] inst;
 	wire [31:0] inst_s2;
 	im #(.NMEM(NMEM), .IM_DATA(IM_DATA))
@@ -76,7 +62,23 @@ module cpu(
 						.hold(stall_s1_s2), .clear(flush_s1),
 						.in(inst), .out(inst_s2));
 
-	// }}}
+
+	wire [31:0] pc4;  /* PC + 4 as mips is  32bit instruction we need to increment 4 time 
+	                   for byte addressable if word addressable then increment by 1 is enough */
+	assign pc4 = pc + 4;
+
+	always @(posedge clk) begin
+		if (stall_s1_s2) 
+			pc <= pc;  //if inst is in process then do not increment pc of that respective inst
+		else if (pcsrc == 1'b1)
+			pc <= baddr_s4;  //branch address
+		else if (jump_s4 == 1'b1)
+			pc <= jaddr_s4;  //jump address
+		else
+			pc <= pc4;
+	end
+
+	
 
 	// {{{ stage 2, ID (decode)
 
@@ -86,7 +88,6 @@ module cpu(
 	wire [4:0]  rt;
 	wire [4:0]  rd;
 	wire [15:0] imm;
-	wire [4:0]  shamt;
 	wire [31:0] jaddr_s2;
 	wire [31:0] seimm;  // sign extended immediate
 	//
@@ -95,7 +96,6 @@ module cpu(
 	assign rt       = inst_s2[20:16];
 	assign rd       = inst_s2[15:11];
 	assign imm      = inst_s2[15:0];
-	assign shamt    = inst_s2[10:6];
 	assign jaddr_s2 = {pc[31:28], inst_s2[25:0], {2{1'b0}}};
 	assign seimm 	= {{16{inst_s2[15]}}, inst_s2[15:0]};
 
@@ -350,31 +350,23 @@ module cpu(
 	end
 	// }}}
 
-	// {{{ load use data hazard detection, signal stall
-
-	/* If an operation in stage 4 (MEM) loads from memory (e.g. lw)
+	
+	// load use data hazard detection, signal stall
+	
+	/* If an operation in stage 5 (WB) write the value to the register
 	 * and the operation in stage 3 (EX) depends on this value,
-	 * a stall must be performed.  The memory read cannot 
-	 * be forwarded because memory access is too slow.  It can
-	 * be forwarded from stage 5 (WB) after a stall.
-	 *
-	 *   lw $1, 16($10)  ; I-type, rt_s3 = $1, memread_s3 = 1
-	 *   sw $1, 32($12)  ; I-type, rt_s2 = $1, memread_s2 = 0
-	 *
-	 *   lw $1, 16($3)  ; I-type, rt_s3 = $1, memread_s3 = 1
-	 *   sw $2, 32($1)  ; I-type, rt_s2 = $2, rs_s2 = $1, memread_s2 = 0
-	 *
-	 *   lw  $1, 16($3)  ; I-type, rt_s3 = $1, memread_s3 = 1
-	 *   add $2, $1, $1  ; R-type, rs_s2 = $1, rt_s2 = $1, memread_s2 = 0
+	 * a stall must be performed.  
+  	 *
+	 *   ADD R1, R2, R5  ;
+  	 *   Sub R5, R1, R3 ;
 	 */
 	always @(*) begin
-		if (memread_s3 == 1'b1 && ((rt == rt_s3) || (rs == rt_s3)) ) begin
+		if ((rt == rt_s3) || (rs == rt_s3) ) begin
 			stall_s1_s2 <= 1'b1;  // perform a stall
 		end else
 			stall_s1_s2 <= 1'b0;  // no stall
 	end
-	// }}}
+
 
 endmodule
 
-// vim:foldmethod=marker
