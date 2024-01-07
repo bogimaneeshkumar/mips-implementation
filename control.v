@@ -1,10 +1,7 @@
-`ifndef _control
-`define _control
-
 module control(
 		input  wire	[5:0]	opcode,
 		output reg			branch_eq, branch_ne,
-		output reg [1:0]	aluop,
+		output reg [3:0]	aluctl,
 		output reg			memread, memwrite, memtoreg,
 		output reg			regdst, regwrite, alusrc,
 		output reg			jump);
@@ -23,33 +20,26 @@ module control(
 		jump		<= 1'b0;
 
 		case (opcode)
-			6'b100011: begin	/* lw */
+			6'b000011: begin	/* lw */
 				memread  <= 1'b1;
 				regdst   <= 1'b0;
 				memtoreg <= 1'b1;
-				aluop[1] <= 1'b0;
 				alusrc   <= 1'b1;
 			end
 			6'b001000: begin	/* addi */
 				regdst   <= 1'b0;
-				aluop[1] <= 1'b0;
 				alusrc   <= 1'b1;
 			end
-			6'b000100: begin	/* beq */
-				aluop[0]  <= 1'b1;
-				aluop[1]  <= 1'b0;
+			6'b010100: begin	/* beq */
 				branch_eq <= 1'b1;
 				regwrite  <= 1'b0;
 			end
-			6'b101011: begin	/* sw */
+			6'b001011: begin	/* sw */
 				memwrite <= 1'b1;
-				aluop[1] <= 1'b0;
 				alusrc   <= 1'b1;
 				regwrite <= 1'b0;
 			end
-			6'b000101: begin	/* bne */
-				aluop[0]  <= 1'b1;
-				aluop[1]  <= 1'b0;
+			6'b010101: begin	/* bne */
 				branch_ne <= 1'b1;
 				regwrite  <= 1'b0;
 			end
@@ -60,6 +50,15 @@ module control(
 			end
 		endcase
 	end
+	
+		always @(*) begin
+    case(opcode[5:4])
+			2'd0: aluctl <= 4'd2;	/* add */
+			2'd1: aluctl <= 4'd6;	/* sub */
+			2'd2: aluctl <= funct[3:0];
+			2'd3: aluctl <= 4'd2;	/* add */
+			default: aluctl = 0;
+		endcase
+	end
+	
 endmodule
-
-`endif
