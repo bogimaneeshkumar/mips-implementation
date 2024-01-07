@@ -30,7 +30,11 @@ module control(
 				regdst   <= 1'b0;
 				alusrc   <= 1'b1;
 			end
-			6'b010100: begin	/* beq */
+			6'b011000: begin	/* subi */
+				regdst   <= 1'b0;
+				alusrc   <= 1'b1;
+			end
+			6'b110100: begin	/* beq */
 				branch_eq <= 1'b1;
 				regwrite  <= 1'b0;
 			end
@@ -39,13 +43,13 @@ module control(
 				alusrc   <= 1'b1;
 				regwrite <= 1'b0;
 			end
-			6'b010101: begin	/* bne */
+			6'b110101: begin	/* bne */
 				branch_ne <= 1'b1;
 				regwrite  <= 1'b0;
 			end
-			6'b000000: begin	/* add */
+			6'b100010: begin	/* add */
 			end
-			6'b000010: begin	/* j jump */
+			6'b000010: begin	/* jump */
 				jump <= 1'b1;
 			end
 		endcase
@@ -53,8 +57,8 @@ module control(
 	
 		always @(*) begin
     case(opcode[5:4])
-			2'd0: aluctl <= 4'd2;	/* add */
-			2'd1: aluctl <= 4'd6;	/* sub */
+			2'd0: aluctl <= 4'd2;	/* addi */
+			2'd1: aluctl <= 4'd6;	/* subi */
 			2'd2: aluctl <= funct[3:0];
 			2'd3: aluctl <= 4'd2;	/* add */
 			default: aluctl = 0;
