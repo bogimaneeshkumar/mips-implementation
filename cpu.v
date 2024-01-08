@@ -285,7 +285,7 @@ module cpu(
 
 	// data memory
 	wire [31:0] rdata;
-	dm dm1(.clk(clk), .addr(alurslt_s4[8:2]), .rd(memread_s4), .wr(memwrite_s4),
+	dm dm1(.clk(clk), .addr(alurslt_s4), .rd(memread_s4), .wr(memwrite_s4),
 			.wdata(data2_s4), .rdata(rdata));
 	// pass read data to stage 5
 	wire [31:0] rdata_s5;
