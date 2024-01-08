@@ -14,8 +14,6 @@ module cpu(
 	wire [31:0]	wrdata_s5;
 	reg stall_s1_s2;
 
-	
-
 	/*  flush control to flush the 1st 3 stages of pipeline in case of 
 	  jump or branch instrustions to prevent from hazards */
 	reg flush_s1, flush_s2, flush_s3;
