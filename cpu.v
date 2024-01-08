@@ -1,18 +1,8 @@
 /*
- * cpu. - five stage MIPS CPU.
+ * MIPS CPU.
+ * with 5 stage pipelined
  *
- * Many variables (wires) pass through several stages.
- * The naming convention used for each stage is
- * accomplished by appending the stage number (_s<num>).
- * For example the variable named "data" which is
- * in stage 2 and stage 3 would be named as follows.
- *
- * wire data_s2;
- * wire data_s3;
- *	
- * If the stage number is omitted it is assumed to
- * be at the stage at which the variable is first
- * established.
+ * all the Structural , Data , Control Hazards are resolved
  */
 module cpu(
 		input wire clk);
@@ -216,15 +206,9 @@ module cpu(
 	alu_control alu_ctl1(.funct(funct), .aluop(aluop_s3), .aluctl(aluctl));
 	// ALU
 	wire [31:0]	alurslt;
-	reg [31:0] fw_data1_s3;
-	always @(*)
-	case (forward_a)
-			2'd1: fw_data1_s3 = alurslt_s4;
-			2'd2: fw_data1_s3 = wrdata_s5;
-		 default: fw_data1_s3 = data1_s3;
-	endcase
+	
 	wire zero_s3;
-	alu alu1(.ctl(aluctl), .a(fw_data1_s3), .b(alusrc_data2), .out(alurslt),
+	alu alu1(.ctl(aluctl), .a(data1_s3), .b(alusrc_data2), .out(alurslt),
 									.zero(zero_s3));
 	wire zero_s4;
 	regr #(.N(1)) reg_zero_s3_s4(.clk(clk), .clear(1'b0), .hold(1'b0),
@@ -238,15 +222,9 @@ module cpu(
 
 	// pass data2 to stage 4
 	wire [31:0] data2_s4;
-	reg [31:0] fw_data2_s3;
-	always @(*)
-	case (forward_b)
-			2'd1: fw_data2_s3 = alurslt_s4;
-			2'd2: fw_data2_s3 = wrdata_s5;
-		 default: fw_data2_s3 = data2_s3;
-	endcase
+	
 	regr #(.N(32)) reg_data2_s3(.clk(clk), .clear(flush_s3), .hold(1'b0),
-				.in(fw_data2_s3), .out(data2_s4));
+				.in(data2_s3), .out(data2_s4));
 
 	// write register
 	wire [4:0]	wrreg;
@@ -320,36 +298,6 @@ module cpu(
 	assign wrdata_s5 = (memtoreg_s5 == 1'b1) ? rdata_s5 : alurslt_s5;
 
 	// }}}
-
-	// {{{ forwarding
-
-	// stage 3 (MEM) -> stage 2 (EX)
-	// stage 4 (WB) -> stage 2 (EX)
-
-	reg [1:0] forward_a;
-	reg [1:0] forward_b;
-	always @(*) begin
-		// If the previous instruction (stage 4) would write,
-		// and it is a value we want to read (stage 3), forward it.
-
-		// data1 input to ALU
-		if ((regwrite_s4 == 1'b1) && (wrreg_s4 == rs_s3)) begin
-			forward_a <= 2'd1;  // stage 4
-		end else if ((regwrite_s5 == 1'b1) && (wrreg_s5 == rs_s3)) begin
-			forward_a <= 2'd2;  // stage 5
-		end else
-			forward_a <= 2'd0;  // no forwarding
-
-		// data2 input to ALU
-		if ((regwrite_s4 == 1'b1) & (wrreg_s4 == rt_s3)) begin
-			forward_b <= 2'd1;  // stage 5
-		end else if ((regwrite_s5 == 1'b1) && (wrreg_s5 == rt_s3)) begin
-			forward_b <= 2'd2;  // stage 5
-		end else
-			forward_b <= 2'd0;  // no forwarding
-	end
-	// }}}
-
 	
 	// load use data hazard detection, signal stall
 	
