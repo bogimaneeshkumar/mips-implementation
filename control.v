@@ -8,7 +8,6 @@ module control(
 
 	always @(*) begin
 		/* defaults */
-		aluop[1:0]	<= 2'b10;
 		alusrc		<= 1'b0;
 		branch_eq	<= 1'b0;
 		branch_ne	<= 1'b0;
