@@ -126,7 +126,7 @@ module cpu(
 	wire		memread;
 	wire		memwrite;
 	wire		memtoreg;
-	wire [1:0]	aluop;
+	wire [3:0]	aluctl;
 	wire		regwrite;
 	wire		alusrc;
 	wire		jump_s2;
@@ -134,7 +134,7 @@ module cpu(
 	control ctl1(.opcode(opcode), .regdst(regdst),
 				.branch_eq(branch_eq_s2), .branch_ne(branch_ne_s2),
 				.memread(memread),
-				.memtoreg(memtoreg), .aluop(aluop),
+		     .memtoreg(memtoreg), .aluctl(aluctl),
 				.memwrite(memwrite), .alusrc(alusrc),
 				.regwrite(regwrite), .jump(jump_s2));
 
@@ -150,16 +150,16 @@ module cpu(
 	wire		memread_s3;
 	wire		memwrite_s3;
 	wire		memtoreg_s3;
-	wire [1:0]	aluop_s3;
+	wire [3:0]	aluctl_s3;
 	wire		regwrite_s3;
 	wire		alusrc_s3;
 	// A bubble is inserted by setting all the control signals
 	// to zero (stall_s1_s2).
 	regr #(.N(8)) reg_s2_control(.clk(clk), .clear(stall_s1_s2), .hold(1'b0),
 			.in({regdst, memread, memwrite,
-					memtoreg, aluop, regwrite, alusrc}),
+					memtoreg, aluctl, regwrite, alusrc}),
 			.out({regdst_s3, memread_s3, memwrite_s3,
-					memtoreg_s3, aluop_s3, regwrite_s3, alusrc_s3}));
+					memtoreg_s3, aluctl_s3, regwrite_s3, alusrc_s3}));
 
 	wire branch_eq_s3, branch_ne_s3;
 	regr #(.N(2)) branch_s2_s3(.clk(clk), .clear(flush_s2), .hold(1'b0),
@@ -193,18 +193,12 @@ module cpu(
 				.out({regwrite_s4, memtoreg_s4, memread_s4,
 						memwrite_s4}));
 
-	// ALU
 	// second ALU input can come from an immediate value or data
 	wire [31:0] alusrc_data2;
 	assign alusrc_data2 = (alusrc_s3) ? seimm_s3 : fw_data2_s3;
-	// ALU control
-	wire [3:0] aluctl;
-	wire [5:0] funct;
-	assign funct = seimm_s3[5:0];
-	alu_control alu_ctl1(.funct(funct), .aluop(aluop_s3), .aluctl(aluctl));
+	
 	// ALU
 	wire [31:0]	alurslt;
-	
 	wire zero_s3;
 	alu alu1(.ctl(aluctl), .a(data1_s3), .b(alusrc_data2), .out(alurslt),
 									.zero(zero_s3));
