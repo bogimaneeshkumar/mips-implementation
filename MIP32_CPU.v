@@ -114,11 +114,6 @@ module cpu(
 	regr #(.N(10)) reg_s2_rt_rd(.clk(clk), .clear(flush_s2), .hold(stall_s1_s2),
 						.in({rt, rd}), .out({rt_s3, rd_s3}));
 
-	// transfer PC + 4 to stage 3
-	wire [31:0] pc4_s3;
-	regr #(.N(32)) reg_pc4_s2(.clk(clk), .clear(1'b0), .hold(stall_s1_s2),
-						.in(pc4_s2), .out(pc4_s3));
-
 	// control (opcode -> ...)
 	wire		regdst;
 	wire		branch_eq_s2;
