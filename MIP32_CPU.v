@@ -37,7 +37,7 @@ module cpu(
 	end
 	// pass PC + 4 to stage 2
 	wire [31:0] pc4_s2;
-	regr #(.N(32)) regr_pc4_s2(.clk(clk),
+	regr #(.N(32)) regr_pc4_s1(.clk(clk),
 						.hold(stall_s1_s2), .clear(flush_s1),
 						.in(pc4), .out(pc4_s2));
 
@@ -46,7 +46,7 @@ module cpu(
 	wire [31:0] inst_s2;
 	im #(.NMEM(NMEM), .IM_DATA(IM_DATA))
 		im1(.clk(clk), .addr(pc), .data(inst));
-	regr #(.N(32)) regr_im_s2(.clk(clk),
+	regr #(.N(32)) regr_im_s1(.clk(clk),
 						.hold(stall_s1_s2), .clear(flush_s1),
 						.in(inst), .out(inst_s2));
 
@@ -96,7 +96,7 @@ module cpu(
 
 	// pass rs to stage 3 (for forwarding)
 	wire [4:0] rs_s3;
-	regr #(.N(5)) regr_s2_rs(.clk(clk), .clear(1'b0), .hold(stall_s1_s2),
+	regr #(.N(5)) regr_s2_rs(.clk(clk), .clear(flush_s2), .hold(stall_s1_s2),
 				.in(rs), .out(rs_s3));
 
 	// transfer register data to stage 3
@@ -182,7 +182,7 @@ module cpu(
 	wire memtoreg_s4;
 	wire memread_s4;
 	wire memwrite_s4;
-	regr #(.N(4)) reg_s3(.clk(clk), .clear(flush_s2), .hold(1'b0),
+	regr #(.N(4)) reg_s3(.clk(clk), .clear(flush_s3), .hold(1'b0),
 				.in({regwrite_s3, memtoreg_s3, memread_s3,
 						memwrite_s3}),
 				.out({regwrite_s4, memtoreg_s4, memread_s4,
@@ -288,7 +288,7 @@ module cpu(
 	
 	// load use data hazard detection, signal stall
 	
-	/* If an operation in stage 5 (WB) write the value to the register
+	/* If an operation in stage 5 (WB) write the value to the register bank
 	 * and the operation in stage 3 (EX) depends on this value,
 	 * a stall must be performed.  
   	 *
