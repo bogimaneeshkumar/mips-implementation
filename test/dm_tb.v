@@ -1,8 +1,6 @@
 /*
  * Data memory test bench for five stage MIPS CPU.
  *
- * Currently only runs for several cycles and
- * dumps a .vcd for Gtkwave.
  */
 
 `include "dm.v"
