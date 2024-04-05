@@ -8,7 +8,7 @@ module cpu(
 		input wire clk);
 
 	parameter NMEM = 32; 
-        parameter IM_DATA = 128;
+    parameter IM_DATA = 128;
 	wire regwrite_s5;
 	wire [4:0] wrreg_s5;
 	wire [31:0]	wrdata_s5;
@@ -174,7 +174,7 @@ module cpu(
 	regr #(.N(32)) reg_jaddr_s3(.clk(clk), .clear(flush_s2), .hold(1'b0),
 				.in(jaddr_s2), .out(jaddr_s3));
 	// }}}
-
+reg_jaddr_s4
 	// {{{ stage 3, EX (execute)
 
 	// pass through some control signals to stage 4
@@ -190,12 +190,12 @@ module cpu(
 
 	// second ALU input can come from an immediate value or data
 	wire [31:0] alusrc_data2;
-	assign alusrc_data2 = (alusrc_s3) ? seimm_s3 : fw_data2_s3;
+	assign alusrc_data2 = (alusrc_s3) ? seimm_s3 : data2_s3;
 	
 	// ALU
 	wire [31:0]	alurslt;
 	wire zero_s3;
-	alu alu1(.ctl(aluctl), .a(data1_s3), .b(alusrc_data2), .out(alurslt),
+	alu alu1(.alu_op(aluctl_s3), .a(data1_s3), .b(alusrc_data2), .out(alurslt),
 									.zero(zero_s3));
 	wire zero_s4;
 	regr #(.N(1)) reg_zero_s3_s4(.clk(clk), .clear(1'b0), .hold(1'b0),
@@ -229,6 +229,7 @@ module cpu(
 	wire [31:0] baddr_s4;
 	regr #(.N(32)) baddr_s3_s4(.clk(clk), .clear(flush_s3), .hold(1'b0),
 				.in(baddr_s3), .out(baddr_s4));
+				
 
 	wire jump_s4;
 	regr #(.N(1)) reg_jump_s4(.clk(clk), .clear(flush_s3), .hold(1'b0),
@@ -304,4 +305,3 @@ module cpu(
 
 
 endmodule
-
