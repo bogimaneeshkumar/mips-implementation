@@ -174,7 +174,7 @@ module cpu(
 	regr #(.N(32)) reg_jaddr_s3(.clk(clk), .clear(flush_s2), .hold(1'b0),
 				.in(jaddr_s2), .out(jaddr_s3));
 	// }}}
-reg_jaddr_s4
+
 	// {{{ stage 3, EX (execute)
 
 	// pass through some control signals to stage 4
