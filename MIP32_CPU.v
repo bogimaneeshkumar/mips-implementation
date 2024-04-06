@@ -157,21 +157,21 @@ module cpu(
 					memtoreg_s3, aluctl_s3, regwrite_s3, alusrc_s3}));
 
 	wire branch_eq_s3, branch_ne_s3;
-	regr #(.N(2)) branch_s2_s3(.clk(clk), .clear(flush_s2), .hold(1'b0),
+	regr #(.N(2)) branch_s2(.clk(clk), .clear(flush_s2), .hold(1'b0),
 				.in({branch_eq_s2, branch_ne_s2}),
 				.out({branch_eq_s3, branch_ne_s3}));
 
 	wire [31:0] baddr_s3;
-	regr #(.N(32)) baddr_s2_s3(.clk(clk), .clear(flush_s2), .hold(1'b0),
+	regr #(.N(32)) reg_baddr_s2(.clk(clk), .clear(flush_s2), .hold(1'b0),
 				.in(baddr_s2), .out(baddr_s3));
 
 	wire jump_s3;
-	regr #(.N(1)) reg_jump_s3(.clk(clk), .clear(flush_s2), .hold(1'b0),
+	regr #(.N(1)) reg_jump_s2(.clk(clk), .clear(flush_s2), .hold(1'b0),
 				.in(jump_s2),
 				.out(jump_s3));
 
 	wire [31:0] jaddr_s3;
-	regr #(.N(32)) reg_jaddr_s3(.clk(clk), .clear(flush_s2), .hold(1'b0),
+	regr #(.N(32)) reg_jaddr_s2(.clk(clk), .clear(flush_s2), .hold(1'b0),
 				.in(jaddr_s2), .out(jaddr_s3));
 	// }}}
 
@@ -198,7 +198,7 @@ module cpu(
 	alu alu1(.alu_op(aluctl_s3), .a(data1_s3), .b(alusrc_data2), .out(alurslt),
 									.zero(zero_s3));
 	wire zero_s4;
-	regr #(.N(1)) reg_zero_s3_s4(.clk(clk), .clear(1'b0), .hold(1'b0),
+	regr #(.N(1)) reg_zero_s3(.clk(clk), .clear(1'b0), .hold(1'b0),
 					.in(zero_s3), .out(zero_s4));
 
 	// pass ALU result and zero to stage 4
@@ -222,22 +222,22 @@ module cpu(
 				.in(wrreg), .out(wrreg_s4));
 
 	wire branch_eq_s4, branch_ne_s4;
-	regr #(.N(2)) branch_s3_s4(.clk(clk), .clear(flush_s3), .hold(1'b0),
+	regr #(.N(2)) reg_branch_s3(.clk(clk), .clear(flush_s3), .hold(1'b0),
 				.in({branch_eq_s3, branch_ne_s3}),
 				.out({branch_eq_s4, branch_ne_s4}));
 
 	wire [31:0] baddr_s4;
-	regr #(.N(32)) baddr_s3_s4(.clk(clk), .clear(flush_s3), .hold(1'b0),
+	regr #(.N(32)) reg_baddr_s3(.clk(clk), .clear(flush_s3), .hold(1'b0),
 				.in(baddr_s3), .out(baddr_s4));
 				
 
 	wire jump_s4;
-	regr #(.N(1)) reg_jump_s4(.clk(clk), .clear(flush_s3), .hold(1'b0),
+	regr #(.N(1)) reg_jump_s3(.clk(clk), .clear(flush_s3), .hold(1'b0),
 				.in(jump_s3),
 				.out(jump_s4));
 
 	wire [31:0] jaddr_s4;
-	regr #(.N(32)) reg_jaddr_s4(.clk(clk), .clear(flush_s3), .hold(1'b0),
+	regr #(.N(32)) reg_jaddr_s3(.clk(clk), .clear(flush_s3), .hold(1'b0),
 				.in(jaddr_s3), .out(jaddr_s4));
 	// }}}
 
