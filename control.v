@@ -58,7 +58,7 @@ module control(
     case(opcode[5:4])
 			2'd0: aluctl <= 4'd2;	/* addi */
 			2'd1: aluctl <= 4'd0;	/* jump */
-			2'd2: aluctl <= funct[3:0];
+			2'd2: aluctl <= opcode[3:0];
 			2'd3: aluctl <= 4'd6;	// subi or branch /* for branch inst using sub like beq r1 r2 loop means branch to loop if r1 = r2 , so we do r1-r2 in alu then using zero flag we identify wheather to perform branching or not */
 			default: aluctl = 0;
 		endcase
