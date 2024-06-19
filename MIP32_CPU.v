@@ -53,7 +53,7 @@ module cpu(
 
 	wire [31:0] pc4;  /* PC + 4 as mips is  32bit instruction we need to increment 4 time 
 	                   for byte addressable if word addressable then increment by 1 is enough */
-	assign pc4 = pc + 4;
+	assign pc4 = pc + 1;
 
 	always @(posedge clk) begin
 		if (stall_s1_s2) 
