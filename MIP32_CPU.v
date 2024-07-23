@@ -36,10 +36,10 @@ module cpu(
 		pc <= 32'd0;
 	end
 	// pass PC + 4 to stage 2
-	wire [31:0] pc1_s2;
-	regr #(.N(32)) regr_pc1_s1(.clk(clk),
+	wire [31:0] pc4_s2;
+	regr #(.N(32)) regr_pc4_s1(.clk(clk),
 						.hold(stall_s1_s2), .clear(flush_s1),
-				   .in(pc1), .out(pc1_s2));
+						.in(pc4), .out(pc4_s2));
 
 	// instruction memory and pass instruction from stage 1 to 2
 	wire [31:0] inst;
@@ -51,9 +51,9 @@ module cpu(
 						.in(inst), .out(inst_s2));
 
 
-	wire [31:0] pc1;  /* PC + 4 as mips is  32bit instruction we need to increment 4 time 
+	wire [31:0] pc4;  /* PC + 4 as mips is  32bit instruction we need to increment 4 time 
 	                   for byte addressable if word addressable then increment by 1 is enough */
-	assign pc1 = pc + 1;
+	assign pc4 = pc + 4;
 
 	always @(posedge clk) begin
 		if (stall_s1_s2) 
@@ -63,7 +63,7 @@ module cpu(
 		else if (jump_s4 == 1'b1)
 			pc <= jaddr_s4;  //jump address
 		else
-			pc <= pc1;
+			pc <= pc4;
 	end
 
 	
@@ -138,7 +138,7 @@ module cpu(
 	assign seimm_sl2 = {seimm[29:0], 2'b0};  // shift left 2 bits
 	// branch address
 	wire [31:0] baddr_s2;
-	assign baddr_s2 = pc1_s2 + seimm_sl2;
+	assign baddr_s2 = pc4_s2 + seimm_sl2;
 
 	// transfer the control signals to stage 3
 	wire		regdst_s3;
